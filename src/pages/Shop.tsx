@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Heart, Cart as CartIcon } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 
@@ -213,7 +213,7 @@ const Shop = () => {
                             handleAddToCart(product);
                           }}
                         >
-                          <CartIcon className="h-4 w-4 mr-2" />
+                          <ShoppingCart className="h-4 w-4 mr-2" />
                           Quick Add
                         </Button>
                       </div>

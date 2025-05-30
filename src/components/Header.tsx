@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, Heart, Cart as CartIcon } from 'lucide-react';
+import { Search, User, Heart, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 
 const Header = () => {
@@ -75,7 +75,7 @@ const Header = () => {
               onClick={() => navigate('/cart')}
               className="hover:bg-velvette-primary/10 relative"
             >
-              <CartIcon className="h-5 w-5" />
+              <ShoppingCart className="h-5 w-5" />
               {totalItems > 0 && (
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-velvette-accent text-white text-xs">
                   {totalItems}

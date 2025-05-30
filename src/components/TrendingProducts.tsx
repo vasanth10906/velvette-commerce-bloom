@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Cart as CartIcon } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 
@@ -124,7 +124,7 @@ const TrendingProducts = () => {
                         handleAddToCart(product);
                       }}
                     >
-                      <CartIcon className="h-4 w-4 mr-2" />
+                      <ShoppingCart className="h-4 w-4 mr-2" />
                       Quick Add
                     </Button>
                   </div>

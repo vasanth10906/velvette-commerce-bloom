@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, Cart as CartIcon, ArrowLeft } from 'lucide-react';
+import { Heart, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 
 const productData = {
@@ -160,7 +160,7 @@ const ProductDetail = () => {
                 className="w-full bg-velvette-accent hover:bg-velvette-accent/90 text-white py-6 text-lg font-medium rounded-full"
                 onClick={handleAddToCart}
               >
-                <CartIcon className="h-5 w-5 mr-2" />
+                <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
               </Button>
               
