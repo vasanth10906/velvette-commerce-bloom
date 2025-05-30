@@ -1,12 +1,18 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import AdminSeeder from '@/components/AdminSeeder';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useProducts } from '@/hooks/useProducts';
+import { Link } from 'react-router-dom';
+import { Plus, Package, TrendingUp, Star } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { data: products, isLoading } = useProducts();
+
+  const featuredCount = products?.filter(p => p.is_featured).length || 0;
+  const trendingCount = products?.filter(p => p.is_trending).length || 0;
+  const totalProducts = products?.length || 0;
 
   return (
     <div className="min-h-screen bg-velvette-background">
@@ -18,48 +24,76 @@ const AdminDashboard = () => {
           <p className="text-velvette-neutral/70">Manage your Velvette store</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Quick Stats */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Products</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {isLoading ? '...' : products?.length || 0}
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Trending Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {isLoading ? '...' : products?.filter(p => p.is_trending).length || 0}
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Featured Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {isLoading ? '...' : products?.filter(p => p.is_featured).length || 0}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          {/* Stats Cards */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Total Products
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : totalProducts}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Trending Items
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : trendingCount}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                Featured Items
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : featuredCount}
+              </div>
+            </CardContent>
+          </Card>
 
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Low Stock
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoading ? '...' : products?.filter(p => p.stock_quantity < 10).length || 0}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Quick Actions */}
+          <div className="lg:col-span-2 space-y-6">
             {/* Recent Products */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Products</CardTitle>
+                <Link to="/admin/products">
+                  <Button variant="outline" size="sm">
+                    View All
+                  </Button>
+                </Link>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -92,7 +126,16 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No products found. Use the quick setup to add sample products.</p>
+                  <div className="text-center py-8">
+                    <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-gray-500 mb-4">No products found. Create your first product to get started.</p>
+                    <Link to="/admin/products">
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Your First Product
+                      </Button>
+                    </Link>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -100,18 +143,48 @@ const AdminDashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <AdminSeeder />
-            
             <Card>
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                <Link to="/admin/products">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Product
+                  </Button>
+                </Link>
+                <Link to="/admin/products">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Package className="h-4 w-4 mr-2" />
+                    Manage Products
+                  </Button>
+                </Link>
+                <Button className="w-full justify-start" variant="outline" disabled>
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  View Analytics
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Store Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
                 <div className="text-sm text-gray-600">
-                  <p>• Add products via database</p>
-                  <p>• Manage categories</p>
-                  <p>• View orders</p>
-                  <p>• Update inventory</p>
+                  <div className="flex justify-between">
+                    <span>Products Active:</span>
+                    <span className="font-medium">{totalProducts}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Featured Products:</span>
+                    <span className="font-medium">{featuredCount}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Trending Products:</span>
+                    <span className="font-medium">{trendingCount}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
