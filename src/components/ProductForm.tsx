@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,7 +19,7 @@ const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   description: z.string().min(1, 'Description is required'),
   price: z.number().min(0.01, 'Price must be greater than 0'),
-  discount_price: z.number().optional(),
+  discount_price: z.number().optional().nullable(),
   stock_quantity: z.number().min(0, 'Stock quantity must be 0 or greater'),
   category_id: z.string().min(1, 'Category is required'),
   sizes: z.array(z.string()).min(1, 'At least one size is required'),
@@ -49,7 +50,7 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
       name: '',
       description: '',
       price: 0,
-      discount_price: undefined,
+      discount_price: null,
       stock_quantity: 0,
       category_id: '',
       sizes: [],
@@ -83,16 +84,19 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
   };
 
   const uploadImages = async (): Promise<string[]> => {
+    console.log('Starting image upload...');
     const uploadPromises = selectedImages.map(async (file, index) => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${index}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
+      console.log('Uploading file:', fileName);
       const { error } = await supabase.storage
         .from('product-images')
         .upload(filePath, file);
 
       if (error) {
+        console.error('Upload error:', error);
         throw error;
       }
 
@@ -100,6 +104,7 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
         .from('product-images')
         .getPublicUrl(filePath);
 
+      console.log('Upload successful, URL:', data.publicUrl);
       return data.publicUrl;
     });
 
@@ -118,6 +123,8 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
   };
 
   const onSubmit = async (data: ProductFormData) => {
+    console.log('Form submitted with data:', data);
+    
     if (selectedImages.length === 0) {
       toast({
         title: "Error",
@@ -129,8 +136,10 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
 
     setIsSubmitting(true);
     try {
+      console.log('Uploading images...');
       // Upload images
       const imageUrls = await uploadImages();
+      console.log('Images uploaded successfully:', imageUrls);
 
       // Prepare product data with explicit type casting for JSON fields
       const productData = {
@@ -147,12 +156,17 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
         tags: JSON.stringify([...(data.tags || []), ...customTags]) as any,
       };
 
+      console.log('Inserting product data:', productData);
       const { error } = await supabase
         .from('products')
         .insert(productData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insert error:', error);
+        throw error;
+      }
 
+      console.log('Product created successfully');
       toast({
         title: "Success!",
         description: "Product has been created successfully.",
@@ -169,7 +183,7 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
       console.error('Error creating product:', error);
       toast({
         title: "Error",
-        description: "Failed to create product. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create product. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -206,7 +220,7 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a category" />
