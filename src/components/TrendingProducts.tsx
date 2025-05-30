@@ -5,63 +5,37 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
-
-const trendingProducts = [
-  {
-    id: '1',
-    name: 'Sunset Midi Dress',
-    price: 89.99,
-    originalPrice: 129.99,
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=500&fit=crop&crop=center',
-    isNew: true,
-    isTrending: true,
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
-  },
-  {
-    id: '2',
-    name: 'Cloud Comfort Sweater',
-    price: 65.99,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=500&fit=crop&crop=center',
-    isNew: false,
-    isTrending: true,
-    sizes: ['XS', 'S', 'M', 'L']
-  },
-  {
-    id: '3',
-    name: 'Vintage Leather Bag',
-    price: 149.99,
-    originalPrice: 199.99,
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=500&fit=crop&crop=center',
-    isNew: true,
-    isTrending: true,
-    sizes: ['One Size']
-  },
-  {
-    id: '4',
-    name: 'Cozy Lounge Set',
-    price: 79.99,
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=500&fit=crop&crop=center',
-    isNew: false,
-    isTrending: true,
-    sizes: ['XS', 'S', 'M', 'L', 'XL']
-  }
-];
+import { useTrendingProducts } from '@/hooks/useProducts';
 
 const TrendingProducts = () => {
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { data: products, isLoading } = useTrendingProducts();
 
-  const handleAddToCart = (product: typeof trendingProducts[0], size: string = 'M') => {
+  const handleAddToCart = (product: any, size: string = 'M') => {
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
-      image: product.image,
+      price: product.discount_price || product.price,
+      image: product.images?.[0] || 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=500&fit=crop&crop=center',
       size: size
     });
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 gradient-bg">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="text-4xl lg:text-5xl font-playfair font-bold mb-4">
+              Trending <span className="gradient-text">Now</span>
+            </h2>
+            <p className="text-lg text-velvette-neutral/80">Loading trending products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 gradient-bg">
@@ -76,7 +50,7 @@ const TrendingProducts = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {trendingProducts.map((product) => (
+          {products?.map((product) => (
             <Card
               key={product.id}
               className="group cursor-pointer overflow-hidden border-0 soft-shadow card-hover bg-white"
@@ -84,7 +58,7 @@ const TrendingProducts = () => {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden">
                   <img
-                    src={product.image}
+                    src={product.images?.[0] || 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=500&fit=crop&crop=center'}
                     alt={product.name}
                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                     onClick={() => navigate(`/product/${product.id}`)}
@@ -92,12 +66,12 @@ const TrendingProducts = () => {
                   
                   {/* Badges */}
                   <div className="absolute top-4 left-4 space-y-2">
-                    {product.isNew && (
+                    {product.is_featured && (
                       <Badge className="bg-velvette-success text-white">
                         New
                       </Badge>
                     )}
-                    {product.originalPrice && (
+                    {product.discount_price && (
                       <Badge className="bg-velvette-warning text-white">
                         Sale
                       </Badge>
@@ -136,11 +110,11 @@ const TrendingProducts = () => {
                   </h3>
                   <div className="flex items-center space-x-2">
                     <span className="text-xl font-bold text-velvette-accent">
-                      ${product.price}
+                      ${product.discount_price || product.price}
                     </span>
-                    {product.originalPrice && (
+                    {product.discount_price && (
                       <span className="text-sm text-gray-500 line-through">
-                        ${product.originalPrice}
+                        ${product.price}
                       </span>
                     )}
                   </div>

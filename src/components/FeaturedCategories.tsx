@@ -1,36 +1,26 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-
-const categories = [
-  {
-    id: 1,
-    name: 'Dresses',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=500&fit=crop&crop=center',
-    description: 'Elegant & Playful'
-  },
-  {
-    id: 2,
-    name: 'Tops',
-    image: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=500&fit=crop&crop=center',
-    description: 'Trendy & Comfortable'
-  },
-  {
-    id: 3,
-    name: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=500&fit=crop&crop=center',
-    description: 'Complete Your Look'
-  },
-  {
-    id: 4,
-    name: 'Loungewear',
-    image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=500&fit=crop&crop=center',
-    description: 'Cozy & Chic'
-  }
-];
+import { useCategories } from '@/hooks/useCategories';
 
 const FeaturedCategories = () => {
   const navigate = useNavigate();
+  const { data: categories, isLoading } = useCategories();
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="text-4xl lg:text-5xl font-playfair font-bold mb-4">
+              Shop by <span className="gradient-text">Category</span>
+            </h2>
+            <p className="text-lg text-velvette-neutral/80">Loading categories...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-white">
@@ -45,16 +35,16 @@ const FeaturedCategories = () => {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => (
+          {categories?.map((category) => (
             <Card
               key={category.id}
               className="group cursor-pointer overflow-hidden border-0 soft-shadow card-hover"
-              onClick={() => navigate(`/shop?category=${category.name.toLowerCase()}`)}
+              onClick={() => navigate(`/shop?category=${category.id}`)}
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden">
                   <img
-                    src={category.image}
+                    src={category.image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=500&fit=crop&crop=center'}
                     alt={category.name}
                     className="w-full h-64 lg:h-80 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
