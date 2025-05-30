@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -133,17 +132,24 @@ const ProductForm = ({ onSuccess }: ProductFormProps) => {
       // Upload images
       const imageUrls = await uploadImages();
 
-      // Prepare product data
+      // Prepare product data with explicit type casting for JSON fields
       const productData = {
-        ...data,
-        images: imageUrls,
-        tags: [...(data.tags || []), ...customTags],
+        name: data.name,
+        description: data.description,
+        price: data.price,
         discount_price: data.discount_price || null,
+        stock_quantity: data.stock_quantity,
+        category_id: data.category_id,
+        is_featured: data.is_featured,
+        is_trending: data.is_trending,
+        images: JSON.stringify(imageUrls) as any,
+        sizes: JSON.stringify(data.sizes) as any,
+        tags: JSON.stringify([...(data.tags || []), ...customTags]) as any,
       };
 
       const { error } = await supabase
         .from('products')
-        .insert([productData]);
+        .insert(productData);
 
       if (error) throw error;
 
